@@ -26,7 +26,7 @@ lazy_static! {
 		Scalar::new(0f64,0f64,255f64,255f64)
 	};
 }
-const DEBUG: bool = false;
+const DEBUG: bool = true;
 fn main() {
 	// Load files
 	let video_path = std::env::args().nth(1).expect("Please provide a video as an argument");
@@ -47,11 +47,28 @@ fn main() {
 	// ----------------
 	// READ FIRST FRAME
 	let mut frame: Mat = Mat::default();
-	video.read(&mut frame).unwrap();
-	imshow("initial", &frame).unwrap();
 	// Find piano
+	let mut piano:Piano;
 	println!("Finding piano...");
-	let mut piano: Piano = Piano::new(&frame, &template);
+	// Loop until we find the piano
+	loop {
+		video.read(&mut frame).unwrap();
+		let result= Piano::new(&frame, &template);
+		match result {
+			Some(piano_result) => {
+				piano = piano_result;
+				if DEBUG {
+					imshow("initial", &frame).unwrap();
+					let key_pressed = wait_key(if DEBUG { 10000 } else {1}).unwrap();
+					if key_pressed == 113 {
+						break;
+					}
+				}
+				break;
+			}
+			None => { continue; }
+		}
+	}
 	println!("Piano has been found!");
 	
 	// ----------

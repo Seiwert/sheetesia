@@ -25,7 +25,7 @@ pub struct Piano {
 
 impl Piano {
 	
-	pub fn new(image: &Mat, unscaled_template: &Mat) -> Piano {
+	pub fn new(image: &Mat, unscaled_template: &Mat) -> Option<Piano> {
 
 		// Scale template to fit the full image
 		let template: Mat = get_scaled_template(&image, &unscaled_template);
@@ -77,7 +77,8 @@ impl Piano {
 			}
 			// Panic if no matches are found ever
 			if thresh > 1.0 {
-				panic!();
+				println!("Unable to pattern match to a piano!");
+				return None;
 			}
 			// Otherwise, increase thresh and loop
 			thresh = thresh + thresh_step;
@@ -90,7 +91,7 @@ impl Piano {
 		};
 		piano.sort_octaves(&image); // Sort it and assign note codes
 		
-		return piano;
+		Some(piano)
 	}
 	
 	

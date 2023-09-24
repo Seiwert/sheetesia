@@ -14,6 +14,7 @@ To compile this project you need [cargo](https://doc.rust-lang.org/cargo/index.h
 
 ``` bash
 sudo apt install libclang-dev
+sudo apt install clang
 sudo apt install llvm
 sudo apt install pkg-config
 sudo apt install libgtk2.0-dev

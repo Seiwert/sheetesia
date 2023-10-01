@@ -26,7 +26,7 @@ lazy_static! {
 		Scalar::new(0f64,0f64,255f64,255f64)
 	};
 }
-const DEBUG: bool = true;
+const DEBUG: bool = false;
 fn main() {
 	// Load files
 	let video_path = std::env::args().nth(1).expect("Please provide a video as an argument");
@@ -43,7 +43,7 @@ fn main() {
 
 	// Make window
 	named_window("Gabo", WINDOW_AUTOSIZE).unwrap();
-	
+
 	// ----------------
 	// READ FIRST FRAME
 	let mut frame: Mat = Mat::default();
@@ -56,12 +56,27 @@ fn main() {
 		let result= Piano::new(&frame, &template);
 		match result {
 			Some(piano_result) => {
-				piano = piano_result;
-				if DEBUG {
+				if piano_result.octaves.len() < 4{
+					println!("Only found {} octaves, continueing", piano_result.octaves.len());
+					continue;
+				}
+				else {
+					piano = piano_result;
+					for octave in &mut piano.octaves {
+						for note in &mut octave.notes {
+							imgproc::circle(&mut frame, Point {
+								x: note.location.x,
+								y: note.location.y,
+							}, 10, UNCHANGED.clone(),-1,LINE_8, 0).unwrap();
+						}
+					}
 					imshow("initial", &frame).unwrap();
-					let key_pressed = wait_key(if DEBUG { 10000 } else {1}).unwrap();
-					if key_pressed == 113 {
+					let key_pressed = wait_key(0).unwrap();
+					if key_pressed == 113 { // Space bar pressed
 						break;
+					}
+					else if key_pressed == 110 { // N key pressed. Manually reject detection to continue
+						continue;
 					}
 				}
 				break;
